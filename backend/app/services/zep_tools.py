@@ -43,10 +43,10 @@ class SearchResult:
     
     def to_text(self) -> str:
         """Convert to text format for LLM understanding"""
-        text_parts = [f"SearchQuery: {self.query}", f"找到 {self.total_count} 条相关Info"]
+        text_parts = [f"SearchQuery: {self.query}", f"Found {self.total_count} related information items"]
         
         if self.facts:
-            text_parts.append("\n### 相关事实:")
+            text_parts.append("\n### Related Facts:")
             for i, fact in enumerate(self.facts, 1):
                 text_parts.append(f"{i}. {fact}")
         
@@ -73,7 +73,7 @@ class NodeInfo:
     
     def to_text(self) -> str:
         """Convert to text format"""
-        entity_type = next((l for l in self.labels if l not in ["Entity", "Node"]), "未知Type")
+        entity_type = next((l for l in self.labels if l not in ["Entity", "Node"]), "Unknown Type")
         return f"Entity: {self.name} (Type: {entity_type})\nSummary: {self.summary}"
 
 
@@ -112,14 +112,14 @@ class EdgeInfo:
         """Convert to text format"""
         source = self.source_node_name or self.source_node_uuid[:8]
         target = self.target_node_name or self.target_node_uuid[:8]
-        base_text = f"Relation: {source} --[{self.name}]--> {target}\n事实: {self.fact}"
+        base_text = f"Relation: {source} --[{self.name}]--> {target}\nFact: {self.fact}"
         
         if include_temporal:
-            valid_at = self.valid_at or "未知"
-            invalid_at = self.invalid_at or "至今"
-            base_text += f"\n时效: {valid_at} - {invalid_at}"
+            valid_at = self.valid_at or "Unknown"
+            invalid_at = self.invalid_at or "Present"
+            base_text += f"\nTemporal: {valid_at} - {invalid_at}"
             if self.expired_at:
-                base_text += f" (已过期: {self.expired_at})"
+                base_text += f" (Expired: {self.expired_at})"
         
         return base_text
     
@@ -170,40 +170,40 @@ class InsightForgeResult:
     def to_text(self) -> str:
         """Convert to detailed text format for LLM understanding"""
         text_parts = [
-            f"## 未来Prediction深度Analysis",
-            f"Analysis问题: {self.query}",
-            f"PredictionScenario: {self.simulation_requirement}",
-            f"\n### PredictionDataStatistics",
-            f"- 相关Prediction事实: {self.total_facts}条",
-            f"- 涉及Entity: {self.total_entities}个",
-            f"- Relationship chain: {self.total_relationships}条"
+            f"## Deep Future Prediction Analysis",
+            f"Analysis Question: {self.query}",
+            f"Prediction Scenario: {self.simulation_requirement}",
+            f"\n### Prediction Data Statistics",
+            f"- Related Prediction Facts: {self.total_facts}",
+            f"- Involved Entities: {self.total_entities}",
+            f"- Relationship Chains: {self.total_relationships}"
         ]
         
-        # Sub-question
+        # Sub-questions
         if self.sub_queries:
-            text_parts.append(f"\n### Analysis的Sub-question")
+            text_parts.append(f"\n### Analysis Sub-questions")
             for i, sq in enumerate(self.sub_queries, 1):
                 text_parts.append(f"{i}. {sq}")
         
-        # 语义SearchResult
+        # Semantic search results
         if self.semantic_facts:
-            text_parts.append(f"\n### 【关键事实】(请在Report中引用这些原文)")
+            text_parts.append(f"\n### [Key Facts] (Please cite these original texts in the report)")
             for i, fact in enumerate(self.semantic_facts, 1):
                 text_parts.append(f"{i}. \"{fact}\"")
         
-        # Entity洞察
+        # Entity insights
         if self.entity_insights:
-            text_parts.append(f"\n### 【核心Entity】")
+            text_parts.append(f"\n### [Core Entities]")
             for entity in self.entity_insights:
-                text_parts.append(f"- **{entity.get('name', '未知')}** ({entity.get('type', 'Entity')})")
+                text_parts.append(f"- **{entity.get('name', 'Unknown')}** ({entity.get('type', 'Entity')})")
                 if entity.get('summary'):
                     text_parts.append(f"  Summary: \"{entity.get('summary')}\"")
                 if entity.get('related_facts'):
-                    text_parts.append(f"  相关事实: {len(entity.get('related_facts', []))}条")
+                    text_parts.append(f"  Related Facts: {len(entity.get('related_facts', []))}")
         
-        # Relationship chain
+        # Relationship chains
         if self.relationship_chains:
-            text_parts.append(f"\n### 【Relationship chain】")
+            text_parts.append(f"\n### [Relationship Chains]")
             for chain in self.relationship_chains:
                 text_parts.append(f"- {chain}")
         
@@ -249,30 +249,30 @@ class PanoramaResult:
     def to_text(self) -> str:
         """Convert to text format (full version, no truncation)"""
         text_parts = [
-            f"## Panoramic search result(未来全景视图)",
+            f"## Panoramic Search Result (Future Panoramic View)",
             f"Query: {self.query}",
-            f"\n### StatisticsInfo",
-            f"- 总Node数: {self.total_nodes}",
-            f"- 总边数: {self.total_edges}",
-            f"- 当前Valid事实: {self.active_count}条",
-            f"- 历史/过期事实: {self.historical_count}条"
+            f"\n### Statistics Information",
+            f"- Total Nodes: {self.total_nodes}",
+            f"- Total Edges: {self.total_edges}",
+            f"- Currently Valid Facts: {self.active_count}",
+            f"- Historical/Expired Facts: {self.historical_count}"
         ]
         
-        # 当前Valid的事实(完整Output, 不截断)
+        # Currently valid facts (full output, no truncation)
         if self.active_facts:
-            text_parts.append(f"\n### 【当前Valid事实】(SimulationResult原文)")
+            text_parts.append(f"\n### [Currently Valid Facts] (Simulation Result Original Text)")
             for i, fact in enumerate(self.active_facts, 1):
                 text_parts.append(f"{i}. \"{fact}\"")
         
-        # 历史/过期事实(完整Output, 不截断)
+        # Historical/expired facts (full output, no truncation)
         if self.historical_facts:
-            text_parts.append(f"\n### 【历史/过期事实】(演变过程Record)")
+            text_parts.append(f"\n### [Historical/Expired Facts] (Evolution Process Record)")
             for i, fact in enumerate(self.historical_facts, 1):
                 text_parts.append(f"{i}. \"{fact}\"")
         
-        # 关键Entity(完整Output, 不截断)
+        # Key entities (full output, no truncation)
         if self.all_nodes:
-            text_parts.append(f"\n### 【涉及Entity】")
+            text_parts.append(f"\n### [Involved Entities]")
             for node in self.all_nodes:
                 entity_type = next((l for l in node.labels if l not in ["Entity", "Node"]), "Entity")
                 text_parts.append(f"- **{node.name}** ({entity_type})")
@@ -302,31 +302,31 @@ class AgentInterview:
     
     def to_text(self) -> str:
         text = f"**{self.agent_name}** ({self.agent_role})\n"
-        # 显示完整的agent_bio, 不截断
-        text += f"_简介: {self.agent_bio}_\n\n"
+        # Show full agent_bio, no truncation
+        text += f"_Bio: {self.agent_bio}_\n\n"
         text += f"**Q:** {self.question}\n\n"
         text += f"**A:** {self.response}\n"
         if self.key_quotes:
-            text += "\n**关键引言:**\n"
+            text += "\n**Key Quotes:**\n"
             for quote in self.key_quotes:
-                # 清理各种引号
+                # Clean various quotation marks
                 clean_quote = quote.replace('\u201c', '').replace('\u201d', '').replace('"', '')
                 clean_quote = clean_quote.replace('\u300c', '').replace('\u300d', '')
                 clean_quote = clean_quote.strip()
-                # 去掉开头的标点
+                # Remove leading punctuation
                 while clean_quote and clean_quote[0] in ', ,;;: :, .!?\n\r\t ':
                     clean_quote = clean_quote[1:]
-                # Filter out junk containing question numbersContent(问题1-9)
+                # Filter out junk containing question numbers content (Questions 1-9)
                 skip = False
                 for d in '123456789':
-                    if f'\u95ee\u9898{d}' in clean_quote:
+                    if f'Question{d}' in clean_quote or f'问题{d}' in clean_quote:
                         skip = True
                         break
                 if skip:
                     continue
-                # 截断过长Content(truncate at period, not hard truncation)
+                # Truncate overly long content (truncate at period, not hard truncation)
                 if len(clean_quote) > 150:
-                    dot_pos = clean_quote.find('\u3002', 80)
+                    dot_pos = clean_quote.find('.', 80)
                     if dot_pos > 0:
                         clean_quote = clean_quote[:dot_pos + 1]
                     else:
@@ -374,13 +374,13 @@ class InterviewResult:
     def to_text(self) -> str:
         """Convert to detailed text format for LLM understanding and report citation"""
         text_parts = [
-            "## 深度InterviewReport",
-            f"**Interview主题:** {self.interview_topic}",
-            f"**Interview人数:** {self.interviewed_count} / {self.total_agents} 位SimulationAgent",
-            "\n### Interview对象选择理由",
-            self.selection_reasoning or "(Auto选择)",
+            "## Deep Interview Report",
+            f"**Interview Topic:** {self.interview_topic}",
+            f"**Interviewees:** {self.interviewed_count} / {self.total_agents} Simulation Agents",
+            "\n### Selection Reasoning",
+            self.selection_reasoning or "(Auto-selected)",
             "\n---",
-            "\n### Interview实录",
+            "\n### Interview Transcript",
         ]
 
         if self.interviews:
@@ -389,10 +389,10 @@ class InterviewResult:
                 text_parts.append(interview.to_text())
                 text_parts.append("\n---")
         else:
-            text_parts.append("(无InterviewRecord)\n\n---")
+            text_parts.append("(No interview records)\n\n---")
 
-        text_parts.append("\n### InterviewSummary与核心观点")
-        text_parts.append(self.summary or "(无Summary)")
+        text_parts.append("\n### Interview Summary and Core Viewpoints")
+        text_parts.append(self.summary or "(No summary available)")
 
         return "\n".join(text_parts)
 
@@ -1345,20 +1345,21 @@ ReturnJSONFormat的Sub-questionList."""
             )
             logger.info(f"Generate了 {len(result.interview_questions)} 个Interview问题")
         
-        # 将问题Merge为一个Interviewprompt
+        # Combine questions into an interview prompt
         combined_prompt = "\n".join([f"{i+1}. {q}" for i, q in enumerate(result.interview_questions)])
         
-        # AddOptimizePrefix, ConstraintAgentReplyFormat
+        # Optimized interview prompt prefix for agents
         INTERVIEW_PROMPT_PREFIX = (
-            "你Currently接受一次Interview. Based on your persona, all past memories and actions,"
-            "以纯Textmanner directly answer the following questions.\n"
-            "Reply要求: \n"
-            "1. Answer directly in natural language, do not call anyTool\n"
-            "2. 不要ReturnJSONFormat或Tool调用Format\n"
-            "3. Do not useMarkdown标题(如#, ##, ###)\n"
-            "4. Answer each question by number, each answer starting with \"QuestionX: \"开头(X为问题编号)\n"
-            "5. Separate each answer with blank lines\n"
-            "6. 回答要有实质Content, answer each question at least2-3句话\n\n"
+            "You are currently taking part in an interview. Based on your persona, all past memories, and actions, "
+            "directly answer the following questions in standard text.\n"
+            "Requirements:\n"
+            "1. Answer directly in natural language; do not call any tools.\n"
+            "2. Do not return JSON format or tool call format.\n"
+            "3. Do not use Markdown headings (e.g., #, ##, ###).\n"
+            "4. Answer each question by its number; start each answer with \"Question X: \" (where X is the question number).\n"
+            "5. Separate each answer with blank lines.\n"
+            "6. Provide substantial content; answer each question with at least 2-3 sentences.\n"
+            "7. ALL output MUST be in English.\n\n"
         )
         optimized_prompt = f"{INTERVIEW_PROMPT_PREFIX}{combined_prompt}"
         
@@ -1414,10 +1415,10 @@ ReturnJSONFormat的Sub-questionList."""
                 twitter_response = self._clean_tool_call_response(twitter_response)
                 reddit_response = self._clean_tool_call_response(reddit_response)
 
-                # 始终Output双Platform标记
-                twitter_text = twitter_response if twitter_response else "(该Platform未获得Reply)"
-                reddit_text = reddit_response if reddit_response else "(该Platform未获得Reply)"
-                response_text = f"【TwitterPlatform回答】\n{twitter_text}\n\n【RedditPlatform回答】\n{reddit_text}"
+                # Always output dual-platform tags
+                twitter_text = twitter_response if twitter_response else "(No response received on this platform)"
+                reddit_text = reddit_response if reddit_response else "(No response received on this platform)"
+                response_text = f"### [Twitter Platform Response]\n{twitter_text}\n\n### [Reddit Platform Response]\n{reddit_text}"
 
                 # Extract key quotes (from twoPlatform的回答中)
                 import re
@@ -1571,25 +1572,26 @@ ReturnJSONFormat的Sub-questionList."""
             summary = {
                 "index": i,
                 "name": profile.get("realname", profile.get("username", f"Agent_{i}")),
-                "profession": profile.get("profession", "未知"),
+                "profession": profile.get("profession", "Unknown"),
                 "bio": profile.get("bio", "")[:200],
                 "interested_topics": profile.get("interested_topics", [])
             }
             agent_summaries.append(summary)
         
-        system_prompt = """你是一个专业的Interview策划专家.你的Task是根据Interview需求, 从SimulationAgentList中选择最适合Interview的对象.
+        system_prompt = """You are a professional interview planning expert. Your task is to select the most suitable simulation agents for an interview based on the requirements.
 
-选择Standard: 
-1. Agent的身份/职业与Interview主题相关
-2. Agentmay hold unique or valuable viewpoints
-3. Select diverse perspectives (e.g.,Supportsupporters, opponents, neutral parties, professionals, etc.)
-4. 优先选择与Event直接相关的Role
+Selection Criteria:
+1. The agent's identity/profession is relevant to the interview topic.
+2. The agent may hold unique or valuable viewpoints.
+3. Select diverse perspectives (e.g., supporters, opponents, neutral parties, professionals, etc.).
+4. Prioritize agents directly involved in the central event.
 
-ReturnJSONFormat: 
+Return ONLY JSON format:
 {
-    "selected_indices": [选中Agent的IndexList],
-    "reasoning": "选择理由说明"
-}"""
+    "selected_indices": [list of selected agent indices],
+    "reasoning": "explanation for the selection"
+}
+IMPORTANT: All reasoning MUST be in English."""
 
         user_prompt = f"""Interview需求: 
 {interview_requirement}
@@ -1612,7 +1614,7 @@ Optional择的AgentList(共{len(agent_summaries)}个):
             )
             
             selected_indices = response.get("selected_indices", [])[:max_agents]
-            reasoning = response.get("reasoning", "基于相关性Auto选择")
+            reasoning = response.get("reasoning", "Automatically selected based on relevance")
             
             # Get选中的Agent完整Info
             selected_agents = []
@@ -1629,7 +1631,7 @@ Optional择的AgentList(共{len(agent_summaries)}个):
             # 降级: 选择前N个
             selected = profiles[:max_agents]
             indices = list(range(min(max_agents, len(profiles))))
-            return selected, indices, "使用Default选择Strategy"
+            return selected, indices, "Selected using default strategy"
     
     def _generate_interview_questions(
         self,
@@ -1639,27 +1641,28 @@ Optional择的AgentList(共{len(agent_summaries)}个):
     ) -> List[str]:
         """使用LLM generationInterview问题"""
         
-        agent_roles = [a.get("profession", "未知") for a in selected_agents]
+        agent_roles = [a.get("profession", "Unknown") for a in selected_agents]
         
-        system_prompt = """You are a professional journalist/Interview者.根据Interview需求, Generate3-5个深度Interview问题.
+        system_prompt = """You are a professional journalist. Based on the interview requirements and simulation context, generate 3-5 deep interview questions.
 
-问题要求: 
-1. Open-ended questions, encouraging detailed answers
-2. 针对不同Role可能有不同答案
-3. covering facts, opinions, feelings, and other dimensions
-4. 语言自然, 像真实Interview一样
-5. 每个问题控制在50字以内, 简洁明了
-6. 直接Question, do not include background explanation orPrefix
+Question Requirements:
+1. Open-ended questions that encourage detailed, insightful answers.
+2. Should elicit different perspectives depending on the agent's role.
+3. Cover facts, opinions, emotional reactions, and future expectations.
+4. Use natural, direct language as in a real professional interview.
+5. Keep each question concise (under 50 words).
+6. Return only the questions without any preamble.
 
-ReturnJSONFormat: {"questions": ["问题1", "问题2", ...]}"""
+Return ONLY JSON: {"questions": ["Question 1", "Question 2", ...]}
+IMPORTANT: All questions MUST be in English."""
 
-        user_prompt = f"""Interview需求: {interview_requirement}
+        user_prompt = f"""Interview Requirements: {interview_requirement}
 
-Simulation背景: {simulation_requirement if simulation_requirement else "未提供"}
+Simulation Context: {simulation_requirement if simulation_requirement else "Not provided"}
 
-Interview对象Role: {', '.join(agent_roles)}
+Agent Roles to Interview: {', '.join(agent_roles)}
 
-请Generate3-5个Interview问题."""
+Generate 3-5 interview questions in English."""
 
         try:
             response = self.llm.chat_json(
@@ -1670,14 +1673,14 @@ Interview对象Role: {', '.join(agent_roles)}
                 temperature=0.5
             )
             
-            return response.get("questions", [f"关于{interview_requirement}, 您有什么看法?"])
+            return response.get("questions", [f"What are your thoughts on {interview_requirement}?"])
             
         except Exception as e:
-            logger.warning(f"GenerateInterview问题Failed: {e}")
+            logger.warning(f"Failed to generate interview questions: {e}")
             return [
-                f"关于{interview_requirement}, 您的观点是什么?",
+                f"What is your perspective on {interview_requirement}?",
                 "What impact does this have on you or the group you represent?",
-                "How do you think this should be resolved orImprovement这个问题?"
+                "How do you think this situation should be resolved or improved?"
             ]
     
     def _generate_interview_summary(
@@ -1688,35 +1691,36 @@ Interview对象Role: {', '.join(agent_roles)}
         """GenerateInterviewSummary"""
         
         if not interviews:
-            return "未Complete任何Interview"
+            return "No interviews were completed."
         
-        # 收集所有InterviewContent
+        # Collect all interview content
         interview_texts = []
         for interview in interviews:
-            interview_texts.append(f"【{interview.agent_name}({interview.agent_role})】\n{interview.response[:500]}")
+            interview_texts.append(f"--- {interview.agent_name} ({interview.agent_role}) ---\n{interview.response[:500]}\n")
         
-        system_prompt = """You are a professional news editor. Based on multiple interviewees' responses,Generate一份InterviewSummary.
+        system_prompt = """You are a professional news editor. Based on multiple interviewees' responses, generate a comprehensive Interview Summary.
 
-Summary要求: 
-1. 提炼各方主要观点
-2. Point out consensus and disagreements
-3. 突出有价值的引言
-4. Objective and neutral, not biased toward any side
-5. 控制在1000字内
+Summary Requirements:
+1. Distill the primary viewpoints from all interviewed parties.
+2. Identify areas of consensus and major points of disagreement.
+3. Highlight valuable and representative quotes.
+4. Maintain an objective, neutral tone throughout.
+5. Keep the total length under 800 words.
 
-FormatConstraint(必须遵守): 
-- 使用纯Textparagraphs, separated by blank lines
-- Do not useMarkdown标题(如#, ##, ###)
-- Do not use separators (such as---, ***)
-- Use quotation marks when citing interviewee quotes
-- 可以使用**加粗**Mark keywords, but do not use otherMarkdown语法"""
+Formatting Constraints:
+- Use plain text paragraphs separated by blank lines.
+- Do NOT use Markdown headings (#, ##, ###).
+- Do NOT use technical separators (---, ***).
+- Use proper quotation marks when citing interviewees.
+- Use **bold text** to emphasize key findings or terms.
+IMPORTANT: The entire summary MUST be in English."""
 
-        user_prompt = f"""Interview主题: {interview_requirement}
+        user_prompt = f"""Interview Topic: {interview_requirement}
 
-InterviewContent: 
+Interview Content:
 {"".join(interview_texts)}
 
-请GenerateInterviewSummary."""
+Please generate the Interview Summary in English."""
 
         try:
             summary = self.llm.chat(
@@ -1730,6 +1734,6 @@ InterviewContent:
             return summary
             
         except Exception as e:
-            logger.warning(f"GenerateInterviewSummaryFailed: {e}")
-            # 降级: 简单拼接
-            return f"共Interview了{len(interviews)}位受访者, 包括: " + ", ".join([i.agent_name for i in interviews])
+            logger.warning(f"Failed to generate interview summary: {e}")
+            # Fallback: simple concatenation
+            return f"Interviewed {len(interviews)} participants, including: " + ", ".join([i.agent_name for i in interviews])

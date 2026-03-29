@@ -930,32 +930,32 @@ class ReportAgent:
                 "name": "insight_forge",
                 "description": TOOL_DESC_INSIGHT_FORGE,
                 "parameters": {
-                    "query": "你想深入Analysis的问题或话题",
-                    "report_context": "当前ReportSection的Context(Optional, 有助于Generate更精准的Sub-question)"
+                    "query": "The question or topic you want to analyze deeply",
+                    "report_context": "Context of the current report section (Optional, helps generate more precise sub-questions)"
                 }
             },
             "panorama_search": {
                 "name": "panorama_search",
                 "description": TOOL_DESC_PANORAMA_SEARCH,
                 "parameters": {
-                    "query": "SearchQuery, 用于相关性Sort",
-                    "include_expired": "是否包含过期/历史Content(DefaultTrue)"
+                    "query": "Search query used for relevance sorting",
+                    "include_expired": "Whether to include expired/historical content (Default: True)"
                 }
             },
             "quick_search": {
                 "name": "quick_search",
                 "description": TOOL_DESC_QUICK_SEARCH,
                 "parameters": {
-                    "query": "SearchQueryString",
-                    "limit": "ReturnResult数量(Optional, Default10)"
+                    "query": "Search query string",
+                    "limit": "Number of results to return (Optional, Default: 10)"
                 }
             },
             "interview_agents": {
                 "name": "interview_agents",
                 "description": TOOL_DESC_INTERVIEW_AGENTS,
                 "parameters": {
-                    "interview_topic": "Interview主题或需求Description(如: 'understand students' opinions on dormitory formaldehydeEvent的看法')",
-                    "max_agents": "最多Interview的Agent数量(Optional, Default5, 最大10)"
+                    "interview_topic": "Interview topic or requirement description (e.g., 'understand consumers\' complaints about pricing')",
+                    "max_agents": "Maximum number of agents to interview (Optional, Default: 5, Max: 10)"
                 }
             }
         }
