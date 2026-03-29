@@ -440,7 +440,7 @@
             <div class="rounds-header">
               <div class="header-left">
                 <span class="section-title">Simulation Rounds Setting</span>
-                <span class="section-desc">MiroFish automatically plans simulation for <span class="desc-highlight">{{ simulationConfig?.time_config?.total_simulation_hours || '-' }}</span> real-world hours, each round represents <span class="desc-highlight">{{ simulationConfig?.time_config?.minutes_per_round || '-' }}</span> minutes of time passing</span>
+                <span class="section-desc">Dextora Foresight automatically plans simulation for <span class="desc-highlight">{{ simulationConfig?.time_config?.total_simulation_hours || '-' }}</span> real-world hours, each round represents <span class="desc-highlight">{{ simulationConfig?.time_config?.minutes_per_round || '-' }}</span> minutes of time passing</span>
               </div>
               <label class="switch-control">
                 <input type="checkbox" v-model="useCustomRounds">

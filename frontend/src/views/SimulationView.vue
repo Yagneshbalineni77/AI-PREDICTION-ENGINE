@@ -3,7 +3,7 @@
     <!-- Header -->
     <header class="app-header">
       <div class="header-left">
-        <div class="brand" @click="router.push('/')">AI Prediction Engine</div>
+        <div class="brand" @click="router.push('/')">Dextora Foresight</div>
       </div>
       
       <div class="header-center">

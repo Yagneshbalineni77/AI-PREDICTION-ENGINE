@@ -2,7 +2,7 @@
   <div class="process-page">
     <!-- Top Navigation Bar -->
     <nav class="navbar">
-      <div class="nav-brand" @click="goHome">AI Prediction Engine</div>
+      <div class="nav-brand" @click="goHome">Dextora Foresight</div>
       
       <!-- Intermediate Step Indicator -->
       <div class="nav-center">

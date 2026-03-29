@@ -1,7 +1,8 @@
 <template>
   <div class="simple-home">
     <header class="app-header">
-      <h1>AI Prediction Engine</h1>
+      <h1>Dextora Foresight</h1>
+      <p class="powered-tag">Market Prediction &amp; AI Simulation Engine &mdash; Powered by Dextora</p>
       <p>Upload context documents and describe the scenario you want to predict.</p>
     </header>
 
@@ -158,6 +159,20 @@ const startSimulation = () => {
 .app-header p {
   color: #64748b;
   font-size: 1.1rem;
+}
+
+.powered-tag {
+  display: inline-block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #2563eb;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 999px;
+  padding: 0.2rem 0.85rem;
+  margin-bottom: 0.6rem;
 }
 
 .main-content {
