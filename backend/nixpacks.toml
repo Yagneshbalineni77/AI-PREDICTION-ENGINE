@@ -1,0 +1,13 @@
+[phases.build]
+cmds = [
+  "pip install --upgrade pip",
+  "pip install torch==2.2.2+cpu --extra-index-url https://download.pytorch.org/whl/cpu",
+  "pip install -r requirements.txt --no-deps --ignore-installed torch",
+  "pip cache purge"
+]
+
+[phases.setup]
+nixPkgs = ["python311"]
+
+[start]
+cmd = "python run.py"

@@ -1,0 +1,20 @@
+# Exclude heavy/unnecessary files from Railway Docker build
+uploads/
+data/
+logs/
+*.log
+*.db
+*.sqlite
+__pycache__/
+**/__pycache__/
+*.pyc
+*.pyo
+.env
+.env.*
+*.tar.gz
+*.zip
+venv/
+.venv/
+env/
+node_modules/
+.git/
