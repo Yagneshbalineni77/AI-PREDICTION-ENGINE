@@ -46,6 +46,34 @@ else:
     if os.path.exists(_backend_env):
         load_dotenv(_backend_env)
 
+# Windows 平台稳定性增强：强制使用 UTF-8 编码并处理文件锁定
+if sys.platform == "win32":
+    # 强制 stdout/stderr 使用 UTF-8
+    if hasattr(sys.stdout, 'reconfigure'):
+        try:
+            sys.stdout.reconfigure(encoding='utf-8')
+            sys.stderr.reconfigure(encoding='utf-8')
+        except Exception:
+            pass
+    
+    # 猴子补丁 builtins.open，默认使用 utf-8 编码，防止 Windows 上的编码错误
+    import builtins
+    _original_open = builtins.open
+    def _open_utf8(file, mode='r', buffering=-1, encoding=None, errors=None, newline=None, closefd=True, opener=None):
+        if encoding is None and 'b' not in mode:
+            encoding = 'utf-8'
+        return _original_open(file, mode, buffering, encoding, errors, newline, closefd, opener)
+    builtins.open = _open_utf8
+
+    # 猴子补丁 sqlite3.connect，默认添加 timeout=20，防止 Windows 上的文件锁定
+    import sqlite3
+    _original_connect = sqlite3.connect
+    def _connect_with_timeout(*args, **kwargs):
+        if 'timeout' not in kwargs:
+            kwargs['timeout'] = 20
+        return _original_connect(*args, **kwargs)
+    sqlite3.connect = _connect_with_timeout
+
 
 import re
 
@@ -311,7 +339,8 @@ class IPCHandler:
             return result
         
         try:
-            conn = sqlite3.connect(db_path)
+            # 使用 timeout 参数，防止 Windows 上的文件锁定导致 OperationalError
+            conn = sqlite3.connect(db_path, timeout=20)
             cursor = conn.cursor()
             
             # 查询最新的Interview记录
@@ -584,8 +613,18 @@ class TwitterSimulationRunner:
         # 数据库路径
         db_path = self._get_db_path()
         if os.path.exists(db_path):
-            os.remove(db_path)
-            print(f"已删除旧数据库: {db_path}")
+            try:
+                os.remove(db_path)
+            except OSError as e:
+                print(f"警告: 无法删除旧数据库 (可能是因为文件被锁定): {e}")
+                import time
+                try:
+                    backup_path = f"{db_path}.bak.{int(time.time())}"
+                    os.rename(db_path, backup_path)
+                    print(f"已将旧数据库重命名为 {backup_path}")
+                except OSError:
+                    pass
+                print(f"已删除旧数据库: {db_path} (或已重命名备份)")
         
         # 创建环境
         print("创建OASIS环境...")

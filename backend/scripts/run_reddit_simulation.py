@@ -46,6 +46,62 @@ else:
     if os.path.exists(_backend_env):
         load_dotenv(_backend_env)
 
+# Windows 平台稳定性增强：强制使用 UTF-8 编码并处理文件锁定
+if sys.platform == "win32":
+    # 强制 stdout/stderr 使用 UTF-8
+    if hasattr(sys.stdout, 'reconfigure'):
+        try:
+            sys.stdout.reconfigure(encoding='utf-8')
+            sys.stderr.reconfigure(encoding='utf-8')
+        except Exception:
+            pass
+    
+    # 猴子补丁 builtins.open，默认使用 utf-8 编码，防止 Windows 上的编码错误
+    import builtins
+    _original_open = builtins.open
+    def _open_utf8(file, mode='r', buffering=-1, encoding=None, errors=None, newline=None, closefd=True, opener=None):
+        if encoding is None and 'b' not in mode:
+            encoding = 'utf-8'
+        return _original_open(file, mode, buffering, encoding, errors, newline, closefd, opener)
+    builtins.open = _open_utf8
+
+    # 猴子补丁 sqlite3.connect，默认添加 timeout=20，防止 Windows 上的文件锁定
+    import sqlite3
+    _original_connect = sqlite3.connect
+    def _connect_with_timeout(*args, **kwargs):
+        if 'timeout' not in kwargs:
+            kwargs['timeout'] = 20
+        return _original_connect(*args, **kwargs)
+    sqlite3.connect = _connect_with_timeout
+
+# Windows 平台稳定性增强：强制使用 UTF-8 编码并处理文件锁定
+if sys.platform == "win32":
+    # 强制 stdout/stderr 使用 UTF-8
+    if hasattr(sys.stdout, 'reconfigure'):
+        try:
+            sys.stdout.reconfigure(encoding='utf-8')
+            sys.stderr.reconfigure(encoding='utf-8')
+        except Exception:
+            pass
+    
+    # 猴子补丁 builtins.open，默认使用 utf-8 编码，防止 Windows 上的编码错误
+    import builtins
+    _original_open = builtins.open
+    def _open_utf8(file, mode='r', buffering=-1, encoding=None, errors=None, newline=None, closefd=True, opener=None):
+        if encoding is None and 'b' not in mode:
+            encoding = 'utf-8'
+        return _original_open(file, mode, buffering, encoding, errors, newline, closefd, opener)
+    builtins.open = _open_utf8
+
+    # 猴子补丁 sqlite3.connect，默认添加 timeout=20，防止 Windows 上的文件锁定
+    import sqlite3
+    _original_connect = sqlite3.connect
+    def _connect_with_timeout(*args, **kwargs):
+        if 'timeout' not in kwargs:
+            kwargs['timeout'] = 20
+        return _original_connect(*args, **kwargs)
+    sqlite3.connect = _connect_with_timeout
+
 
 import re
 
@@ -570,8 +626,18 @@ class RedditSimulationRunner:
         
         db_path = self._get_db_path()
         if os.path.exists(db_path):
-            os.remove(db_path)
-            print(f"已删除旧数据库: {db_path}")
+            try:
+                os.remove(db_path)
+            except OSError as e:
+                print(f"警告: 无法删除旧数据库 (可能是因为文件被锁定): {e}")
+                import time
+                try:
+                    backup_path = f"{db_path}.bak.{int(time.time())}"
+                    os.rename(db_path, backup_path)
+                    print(f"已将旧数据库重命名为 {backup_path}")
+                except OSError:
+                    pass
+                print(f"已删除旧数据库: {db_path} (或已重命名备份)")
         
         print("创建OASIS环境...")
         self.env = oasis.make(
@@ -600,18 +666,10 @@ class RedditSimulationRunner:
                 content = post.get("content", "")
                 try:
                     agent = self.env.agent_graph.get_agent(agent_id)
-                    if agent in initial_actions:
-                        if not isinstance(initial_actions[agent], list):
-                            initial_actions[agent] = [initial_actions[agent]]
-                        initial_actions[agent].append(ManualAction(
-                            action_type=ActionType.CREATE_POST,
-                            action_args={"content": content}
-                        ))
-                    else:
-                        initial_actions[agent] = ManualAction(
-                            action_type=ActionType.CREATE_POST,
-                            action_args={"content": content}
-                        )
+                    initial_actions[agent] = ManualAction(
+                        action_type=ActionType.CREATE_POST,
+                        action_args={"content": content}
+                    )
                 except Exception as e:
                     print(f"  警告: 无法为Agent {agent_id}创建初始帖子: {e}")
             

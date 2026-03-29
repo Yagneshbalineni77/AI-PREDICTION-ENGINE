@@ -64,6 +64,15 @@ if sys.platform == 'win32':
     
     builtins.open = _utf8_open
 
+    # 猴子补丁 sqlite3.connect，默认添加 timeout=20，防止 Windows 上的文件锁定
+    import sqlite3
+    _original_connect = sqlite3.connect
+    def _connect_with_timeout(*args, **kwargs):
+        if 'timeout' not in kwargs:
+            kwargs['timeout'] = 20
+        return _original_connect(*args, **kwargs)
+    sqlite3.connect = _connect_with_timeout
+
 import argparse
 import asyncio
 import json
@@ -528,7 +537,8 @@ class ParallelIPCHandler:
             return result
         
         try:
-            conn = sqlite3.connect(db_path)
+            # 使用 timeout 参数，防止 Windows 上的文件锁定导致 OperationalError
+            conn = sqlite3.connect(db_path, timeout=20)
             cursor = conn.cursor()
             
             # 查询最新的Interview记录
@@ -679,7 +689,8 @@ def fetch_new_actions_from_db(
         return actions, new_last_rowid
     
     try:
-        conn = sqlite3.connect(db_path)
+        # 使用 timeout 参数，防止 Windows 上的文件锁定导致 OperationalError
+        conn = sqlite3.connect(db_path, timeout=20)
         cursor = conn.cursor()
         
         # 使用 rowid 来追踪已处理的记录（rowid 是 SQLite 的内置自增字段）
@@ -1150,7 +1161,10 @@ async def run_twitter_simulation(
     
     db_path = os.path.join(simulation_dir, "twitter_simulation.db")
     if os.path.exists(db_path):
-        os.remove(db_path)
+        try:
+            os.remove(db_path)
+        except OSError:
+            pass
     
     result.env = oasis.make(
         agent_graph=result.agent_graph,
@@ -1341,7 +1355,18 @@ async def run_reddit_simulation(
     
     db_path = os.path.join(simulation_dir, "reddit_simulation.db")
     if os.path.exists(db_path):
-        os.remove(db_path)
+        try:
+            os.remove(db_path)
+        except OSError as e:
+            log_info(f"警告: 无法删除旧数据库 (可能是因为文件被锁定): {e}")
+            # 如果无法删除，尝试重命名它作为一个备份，以释放路径（虽然重命名也可能失败）
+            import time
+            try:
+                backup_path = f"{db_path}.bak.{int(time.time())}"
+                os.rename(db_path, backup_path)
+                log_info(f"已将旧数据库重命名为 {backup_path}")
+            except OSError:
+                log_info("无法重命名旧数据库，将尝试继续使用现有数据库（可能导致数据混合）")
     
     result.env = oasis.make(
         agent_graph=result.agent_graph,
@@ -1375,18 +1400,10 @@ async def run_reddit_simulation(
             content = post.get("content", "")
             try:
                 agent = result.env.agent_graph.get_agent(agent_id)
-                if agent in initial_actions:
-                    if not isinstance(initial_actions[agent], list):
-                        initial_actions[agent] = [initial_actions[agent]]
-                    initial_actions[agent].append(ManualAction(
-                        action_type=ActionType.CREATE_POST,
-                        action_args={"content": content}
-                    ))
-                else:
-                    initial_actions[agent] = ManualAction(
-                        action_type=ActionType.CREATE_POST,
-                        action_args={"content": content}
-                    )
+                initial_actions[agent] = ManualAction(
+                    action_type=ActionType.CREATE_POST,
+                    action_args={"content": content}
+                )
                 
                 if action_logger:
                     action_logger.log_action(

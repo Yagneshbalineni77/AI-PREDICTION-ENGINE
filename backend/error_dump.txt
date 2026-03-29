@@ -1,0 +1,237 @@
+Traceback (most recent call last):
+  File "C:\Users\kotes\.gemini\antigravity\scratch\MiroFish\backend\app\utils\llm_client.py", line 100, in chat_json
+    return json.loads(cleaned_response)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\kotes\AppData\Roaming\uv\python\cpython-3.11-windows-x86_64-none\Lib\json\__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\kotes\AppData\Roaming\uv\python\cpython-3.11-windows-x86_64-none\Lib\json\decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\kotes\AppData\Roaming\uv\python\cpython-3.11-windows-x86_64-none\Lib\json\decoder.py", line 353, in raw_decode
+    obj, end = self.scan_once(s, idx)
+               ^^^^^^^^^^^^^^^^^^^^^^
+json.decoder.JSONDecodeError: Unterminated string starting at: line 211 column 18 (char 8611)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\kotes\.gemini\antigravity\scratch\MiroFish\backend\app\api\graph.py", line 217, in generate_ontology
+    ontology = generator.generate(
+               ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\kotes\.gemini\antigravity\scratch\MiroFish\backend\app\services\ontology_generator.py", line 198, in generate
+    result = self.llm_client.chat_json(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\kotes\.gemini\antigravity\scratch\MiroFish\backend\app\utils\llm_client.py", line 102, in chat_json
+    raise ValueError(f"LLM返回的JSON格式无效: {cleaned_response}")
+ValueError: LLM返回的JSON格式无效: {
+    "entity_types": [
+        {
+            "name": "GovernmentAgency",
+            "description": "An official body responsible for governance and policy-making at a local or national level.",
+            "attributes": [
+                {
+                    "name": "agency_name",
+                    "type": "text",
+                    "description": "The official name of the government agency."
+                },
+                {
+                    "name": "jurisdiction_area",
+                    "type": "text",
+                    "description": "The geographical area over which the agency has authority."
+                }
+            ],
+            "examples": ["Local City Council", "Department of Transportation", "Municipal Government"]
+        },
+        {
+            "name": "RideSharingCompany",
+            "description": "A technology company that connects passengers with drivers through a mobile app.",
+            "attributes": [
+                {
+                    "name": "company_name",
+                    "type": "text",
+                    "description": "The official name of the ride-sharing company."
+                },
+                {
+                    "name": "headquarters_location",
+                    "type": "text",
+                    "description": "The primary location of the company's headquarters."
+                }
+            ],
+            "examples": ["Uber", "Lyft", "Didi Chuxing"]
+        },
+        {
+            "name": "TaxiCompany",
+            "description": "A company operating traditional taxi services, typically with licensed vehicles and drivers.",
+            "attributes": [
+                {
+                    "name": "company_name",
+                    "type": "text",
+                    "description": "The official name of the taxi company."
+                },
+                {
+                    "name": "fleet_size",
+                    "type": "text",
+                    "description": "The approximate number of vehicles operated by the company."
+                }
+            ],
+            "examples": ["Yellow Cab Co.", "City Taxi Services"]
+        },
+        {
+            "name": "TaxiDriver",
+            "description": "An individual who operates a licensed taxi for a living.",
+            "attributes": [
+                {
+                    "name": "full_name",
+                    "type": "text",
+                    "description": "The full name of the taxi driver."
+                },
+                {
+                    "name": "license_id",
+                    "type": "text",
+                    "description": "The unique identifier for the driver's taxi license."
+                }
+            ],
+            "examples": ["John Smith (Taxi Driver)", "Maria Rodriguez (Taxi Driver)"]
+        },
+        {
+            "name": "RideSharingDriver",
+            "description": "An individual who drives for a ride-sharing app.",
+            "attributes": [
+                {
+                    "name": "full_name",
+                    "type": "text",
+                    "description": "The full name of the ride-sharing driver."
+                },
+                {
+                    "name": "platform_affiliation",
+                    "type": "text",
+                    "description": "The ride-sharing platform(s) the driver works for."
+                }
+            ],
+            "examples": ["Alex Chen (Uber Driver)", "Sarah Lee (Lyft Driver)"]
+        },
+        {
+            "name": "Commuter",
+            "description": "A member of the general public who regularly travels between home and work/school.",
+            "attributes": [
+                {
+                    "name": "full_name",
+                    "type": "text",
+                    "description": "The full name of the commuter."
+                },
+                {
+                    "name": "preferred_transport_mode",
+                    "type": "text",
+                    "description": "The commuter's usual mode of transportation."
+                }
+            ],
+            "examples": ["Jane Doe (Commuter)", "Public Transit User"]
+        },
+        {
+            "name": "MediaOutlet",
+            "description": "An organization that disseminates news and information to the public.",
+            "attributes": [
+                {
+                    "name": "outlet_name",
+                    "type": "text",
+                    "description": "The official name of the media outlet."
+                },
+                {
+                    "name": "media_type",
+                    "type": "text",
+                    "description": "The primary type of media (e.g., newspaper, TV, online)."
+                }
+            ],
+            "examples": ["Local News Daily", "City Broadcast TV", "Online News Blog"]
+        },
+        {
+            "name": "DriverUnion",
+            "description": "An organization representing the collective interests of drivers, such as taxi drivers or ride-sharing drivers.",
+            "attributes": [
+                {
+                    "name": "union_name",
+                    "type": "text",
+                    "description": "The official name of the driver's union."
+                },
+                {
+                    "name": "membership_count",
+                    "type": "text",
+                    "description": "The approximate number of members in the union."
+                }
+            ],
+            "examples": ["Taxi Drivers' Association", "Gig Workers' Union"]
+        },
+        {
+            "name": "Person",
+            "description": "A catch-all type for any individual not covered by more specific personal entity types.",
+            "attributes": [
+                {
+                    "name": "full_name",
+                    "type": "text",
+                    "description": "The full name of the person."
+                },
+                {
+                    "name": "occupation_role",
+                    "type": "text",
+                    "description": "The primary occupation or role of the person."
+                }
+            ],
+            "examples": ["Bystander", "Concerned Citizen", "Local Resident"]
+        },
+        {
+            "name": "Organization",
+            "description": "A catch-all type for any organization not covered by more specific organizational entity types.",
+            "attributes": [
+                {
+                    "name": "org_name",
+                    "type": "text",
+                    "description": "The official name of the organization."
+                },
+                {
+                    "name": "org_type",
+                    "type": "text",
+                    "description": "The general type or nature of the organization."
+                }
+            ],
+            "examples": ["Local Business Alliance", "Community Group", "Ad-hoc Committee"]
+        }
+    ],
+    "edge_types": [
+        {
+            "name": "ISSUES_POLICY_AFFECTING",
+            "description": "A government agency announces or implements a policy that impacts another entity.",
+            "source_targets": [
+                {"source": "GovernmentAgency", "target": "RideSharingCompany"},
+                {"source": "GovernmentAgency", "target": "TaxiCompany"},
+                {"source": "GovernmentAgency", "target": "TaxiDriver"},
+                {"source": "GovernmentAgency", "target": "RideSharingDriver"},
+                {"source": "GovernmentAgency", "target": "Commuter"},
+                {"source": "GovernmentAgency", "target": "DriverUnion"}
+            ],
+            "attributes": []
+        },
+        {
+            "name": "EMPLOYS",
+            "description": "A company employs a driver.",
+            "source_targets": [
+                {"source": "TaxiCompany", "target": "TaxiDriver"},
+                {"source": "RideSharingCompany", "target": "RideSharingDriver"}
+            ],
+            "attributes": []
+        },
+        {
+            "name": "REPRESENTS",
+            "description": "A union or association acts on behalf of a group of drivers.",
+            "source_targets": [
+                {"source": "DriverUnion", "target": "TaxiDriver"},
+                {"source": "DriverUnion", "target": "RideSharingDriver"}
+            ],
+            "attributes": []
+        },
+        {
+            "name": "REPORTS_ON",
+            "description": "A media outlet publishes news or information about an entity or event.",
+            "source_targets": [
+                {"source": "MediaOutlet", "target": "GovernmentAgency"},
+                {"

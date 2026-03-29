@@ -1,7 +1,7 @@
-"""Zep Graph 分页读取工具。
+"""Zep Graph 分页ReadTool.
 
-Zep 的 node/edge 列表接口使用 UUID cursor 分页，
-本模块封装自动翻页逻辑（含单页重试），对调用方透明地返回完整列表。
+Zep 的 node/edge ListInterface使用 UUID cursor 分页, 
+本ModuleEncapsulateAuto翻页逻辑(含单页Retry), 对调用方透明地Return完整List.
 """
 
 from __future__ import annotations
@@ -10,8 +10,7 @@ import time
 from collections.abc import Callable
 from typing import Any
 
-from zep_cloud import InternalServerError
-from zep_cloud.client import Zep
+from ..services.graph_store import GraphStore
 
 from .logger import get_logger
 
@@ -31,7 +30,7 @@ def _fetch_page_with_retry(
     page_description: str = "page",
     **kwargs: Any,
 ) -> list[Any]:
-    """单页请求，失败时指数退避重试。仅重试网络/IO类瞬态错误。"""
+    """单页Request, Failed时指数退避Retry.仅Retry网络/IO类瞬态Error."""
     if max_retries < 1:
         raise ValueError("max_retries must be >= 1")
 
@@ -41,7 +40,7 @@ def _fetch_page_with_retry(
     for attempt in range(max_retries):
         try:
             return api_call(*args, **kwargs)
-        except (ConnectionError, TimeoutError, OSError, InternalServerError) as e:
+        except (ConnectionError, TimeoutError, OSError, RuntimeError) as e:
             last_exception = e
             if attempt < max_retries - 1:
                 logger.warning(
@@ -57,14 +56,14 @@ def _fetch_page_with_retry(
 
 
 def fetch_all_nodes(
-    client: Zep,
+    client: GraphStore,
     graph_id: str,
     page_size: int = _DEFAULT_PAGE_SIZE,
     max_items: int = _MAX_NODES,
     max_retries: int = _DEFAULT_MAX_RETRIES,
     retry_delay: float = _DEFAULT_RETRY_DELAY,
 ) -> list[Any]:
-    """分页获取图谱节点，最多返回 max_items 条（默认 2000）。每页请求自带重试。"""
+    """Paginated fetchGraphNode, 最多Return max_items 条(Default 2000).每页Request自带Retry."""
     all_nodes: list[Any] = []
     cursor: str | None = None
     page_num = 0
@@ -103,13 +102,13 @@ def fetch_all_nodes(
 
 
 def fetch_all_edges(
-    client: Zep,
+    client: GraphStore,
     graph_id: str,
     page_size: int = _DEFAULT_PAGE_SIZE,
     max_retries: int = _DEFAULT_MAX_RETRIES,
     retry_delay: float = _DEFAULT_RETRY_DELAY,
 ) -> list[Any]:
-    """分页获取图谱所有边，返回完整列表。每页请求自带重试。"""
+    """Paginated fetchGraph所有边, Return完整List.每页Request自带Retry."""
     all_edges: list[Any] = []
     cursor: str | None = None
     page_num = 0
