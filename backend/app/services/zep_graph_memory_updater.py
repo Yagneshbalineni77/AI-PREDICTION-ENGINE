@@ -237,10 +237,7 @@ class ZepGraphMemoryUpdater:
             api_key: Zep API Key(Optional, Default从ConfigRead)
         """
         self.graph_id = graph_id
-        self.api_key = api_key or Config.ZEP_API_KEY
-        
-        if not self.api_key:
-            raise ValueError("ZEP_API_KEY not configured")
+        self.api_key = api_key or Config.ZEP_API_KEY or "local-sqlite-key"
         
         self.client = GraphStore(api_key=self.api_key)
         

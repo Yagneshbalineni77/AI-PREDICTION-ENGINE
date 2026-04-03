@@ -22,7 +22,7 @@ class Config:
     
     # FlaskConfig
     SECRET_KEY = os.environ.get('SECRET_KEY', 'mirofish-secret-key')
-    DEBUG = os.environ.get('FLASK_DEBUG', 'True').lower() == 'true'
+    DEBUG = os.environ.get('FLASK_DEBUG', 'False').lower() == 'true'
     
     # JSONConfig - DisableASCII转义, 让中文直接显示(而不是 \uXXXX Format)
     JSON_AS_ASCII = False
@@ -69,7 +69,5 @@ class Config:
         errors = []
         if not cls.LLM_API_KEY:
             errors.append("LLM_API_KEY 未Config")
-        if not cls.ZEP_API_KEY:
-            errors.append("ZEP_API_KEY 未Config")
         return errors
 

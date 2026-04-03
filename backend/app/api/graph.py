@@ -282,17 +282,6 @@ def build_graph():
     try:
         logger.info("=== StartBuild graph ===")
         
-        # 检查Config
-        errors = []
-        if not Config.ZEP_API_KEY:
-            errors.append("ZEP_API_KEY not configured")
-        if errors:
-            logger.error(f"ConfigError: {errors}")
-            return jsonify({
-                "success": False,
-                "error": "ConfigError: " + "; ".join(errors)
-            }), 500
-        
         # ParseRequest
         data = request.get_json() or {}
         project_id = data.get('project_id')
@@ -567,12 +556,6 @@ def get_graph_data(graph_id: str):
     GetGraphData(Node和边)
     """
     try:
-        if not Config.ZEP_API_KEY:
-            return jsonify({
-                "success": False,
-                "error": "ZEP_API_KEY not configured"
-            }), 500
-        
         builder = GraphBuilderService(api_key=Config.ZEP_API_KEY)
         graph_data = builder.get_graph_data(graph_id)
         
@@ -595,12 +578,6 @@ def delete_graph(graph_id: str):
     DeleteZepGraph
     """
     try:
-        if not Config.ZEP_API_KEY:
-            return jsonify({
-                "success": False,
-                "error": "ZEP_API_KEY not configured"
-            }), 500
-        
         builder = GraphBuilderService(api_key=Config.ZEP_API_KEY)
         builder.delete_graph(graph_id)
         

@@ -4,6 +4,7 @@
 .cursor
 .DS_Store
 .env
+.env.*
 
 node_modules
 frontend/node_modules
@@ -20,4 +21,16 @@ __pycache__
 frontend/dist
 frontend/.vite
 
-backend/uploads
+backend/uploads/
+backend/data/
+backend/logs/
+
+*.log
+*.txt
+!requirements.txt
+!CMakeLists.txt
+
+render.yaml
+backend/nixpacks.toml
+
+static/
